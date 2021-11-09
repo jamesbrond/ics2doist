@@ -6,8 +6,93 @@ import logging
 import argparse
 import requests
 from ics import Calendar
+from dateutil import parser
 
 TODOIST_API_URL="https://api.todoist.com/rest/v1"
+
+class RRule:
+	def __init__(self, start, rule_string):
+		self._freq_map = {
+			"yearly": "year",
+			"monthly": "month",
+			"weekly": "week",
+			"daily": "day",
+			"hourly": "hour",
+			"minutely": "minute",
+			"secondly": "second"
+		}
+		self._month_list = ['months_start_at_1', 'jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+		self._weekday_map = {
+			"mo": "mon",
+			"tu": "tue",
+			"we": "wed",
+			"th": "thu",
+			"fr": "fri",
+			"sa": "sat",
+			"su": "sun"
+		}
+		self.dtstart = start
+		self._parse(rule_string)
+
+	def _handle_freq(self, rrkwargs, name, value):
+		rrkwargs[name] = self._freq_map[value]
+
+	def _handle_count(self, rrkwargs, name, value):
+		rrkwargs[name] = value
+
+	def _handle_until(self, rrkwargs, name, value):
+		try:
+			rrkwargs[name] = parser.parse(value)
+		except ValueError:
+			raise ValueError("invalid until date")
+
+	def _handle_interval(self, rrkwargs, name, value):
+		rrkwargs[name] = f"{value}"
+
+	def _handle_bymonth(self, rrkwargs, name, value):
+		# TODO rrkwargs[name] = [self._month_list[int(x)] for x in value.split(',')]
+		pass
+
+	def _handle_wkst(self, rrkwargs, name, value):
+		# TODO rrkwargs[name] = self._weekday_map[value]
+		pass
+
+	def _handle_byday(self, rrkwargs, name, value):
+		rrkwargs[name] = [self._weekday_map[x] for x in value.split(',')]
+
+	def __str__(self):
+		s = "every"
+
+		if 'interval' in self.rrkwargs:
+			s += f" {self.rrkwargs['interval']} {self.rrkwargs['freq']}s"
+		elif 'byday' in self.rrkwargs:
+			s += f" {','.join(self.rrkwargs['byday'])}"
+		else:
+			s += f" {self.rrkwargs['freq']}"
+
+		if 'count' in self.rrkwargs:
+			s += f" for {self.rrkwargs['count']} {self.rrkwargs['freq']}s"
+
+		s += f" starting {self.dtstart.date().isoformat()}"
+
+		if 'until' in self.rrkwargs:
+			s += f" ending {self.rrkwargs['until'].date().isoformat()}"
+
+		return s
+
+	def _parse(self, rule_string):
+		line = rule_string.split(':')[1]
+		self.rrkwargs = {}
+		for pair in line.split(';'):
+			name, value = pair.split('=')
+			name = name.lower()
+			value = value.lower()
+			try:
+				getattr(self, "_handle_"+name)(self.rrkwargs, name, value)
+			except AttributeError:
+				raise ValueError("unknown parameter '%s'" % name)
+			except (KeyError, ValueError):
+				raise ValueError("invalid '%s': %s" % (name, value))
 
 def setup(service_id):
 	token = input("Please enter your API token: ")
@@ -58,18 +143,6 @@ def parse_cmd_line():
 
 	return parser.parse_args()
 
-def read_calendar(in_file):
-	events = []
-	with open(in_file, 'r') as file:
-		ics_text = file.read()
-		c = Calendar(ics_text)
-		for e in c.events:
-			events.append({
-				"title": e.name,
-				"date": e.begin.format('YYYY-MM-DD')
-			})
-		return events
-
 def _doist_api_get(api_token, action):
 	return requests.get(
 		f"{TODOIST_API_URL}/{action}",
@@ -87,15 +160,53 @@ def _doist_api_post(api_token, action, data):
 			"Authorization": f"Bearer {api_token}"
 		}).json()
 
-def add_task(api_token, title, due, label_ids):
+def _dump_json(obj):
+	print(json.dumps(obj, indent=3))
+
+def event_to_task(event, label_ids=None, project_id=None, section_id=None):
+	task = {
+		"content": event.name,
+		"description": event.description,
+		"completed": False
+		# TODO priority
+	}
+	if project_id:
+		task["project_id"] = project_id
+	if section_id:
+		task["section_id"] = section_id
+	if label_ids:
+		task["label_ids"] = label_ids
+
+	rrules = None
+	for line in event.extra:
+		if str(line).startswith("RRULE"):
+			rrules = str(line)
+			break
+
+	if rrules != None:
+		task['due_string'] = str(RRule(event.begin, rrules))
+	elif event.all_day:
+		task['due_date'] = event.begin.format('YYYY-MM-DD')
+	else:
+		# TODO check timezone
+		task['due_datetime'] = event.end.isoformat()
+
+	return task
+
+def read_calendar(in_file):
+	"""
+	Gets all events from ICS file
+	"""
+	with open(in_file, 'r') as file:
+		ics_text = file.read()
+	c = Calendar(ics_text)
+	return c.events
+
+def add_task(api_token, task):
 	"""
 	Creates a new task  and returns it as a JSON object
 	"""
-	return _doist_api_post(api_token, 'tasks', {
-		"content": title,
-		"due_date": due,
-		"label_ids": label_ids
-	})
+	return _doist_api_post(api_token, 'tasks', task)
 
 def add_label(api_token, name):
 	"""
@@ -143,24 +254,25 @@ def main():
 			api_token = get_api_token(service_id)
 
 		if args.ics_file:
-			labels = None
+			label = None
 			if args.label:
 				label = get_label(api_token, args.label)
 				if label is None:
 					label = add_label(api_token, args.label)
 			if label != None:
-				labels = [label['id']]
+				label = [label['id']]
 			for event in read_calendar(args.ics_file):
-				print(f"Add task {event['title']} on {event['date']}...", end="")
-				add_task(api_token, event['title'], event['date'], labels)
+				task = event_to_task(event, label)
+				print(f"Add task {task['content']} ... ", end="")
+				add_task(api_token, task)
 				print("\tdone")
 
 		elif args.projects:
-			print(json.dumps(get_all_projects(api_token), indent=3))
+			_dump_json(get_all_projects(api_token))
 		elif args.sections:
-			print(json.dumps(get_all_sections(api_token), indent=3))
+			_dump_json(get_all_sections(api_token))
 		elif args.labels:
-			print(json.dumps(get_all_labels(api_token), indent=3))
+			_dump_json(get_all_labels(api_token))
 
 		return 0
 	except Exception as e:
