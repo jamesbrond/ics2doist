@@ -253,7 +253,7 @@ class ICS2Doist:
 
 
 def parse_cmd_line():
-	parser = argparse.ArgumentParser(prog="todo.py", usage='%(prog)s [options]', description='Import ICS entries as Todoist tasks')
+	parser = argparse.ArgumentParser(prog="ics2doist.py", usage='%(prog)s [options]', description='Import ICS entries as Todoist tasks')
 
 	parser.add_argument('-c', '--calendar',
 		dest='ics_file',
