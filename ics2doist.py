@@ -152,6 +152,14 @@ class ICS2Doist:
 			return emoji_pattern.sub(r'', str).strip()
 		return None
 
+	def _find_needle_in_haystack(self, needle, haystack):
+		for straw in haystack:
+			name = straw['name'].lower()
+			if self._strip_emoji(name) == needle:
+				return straw['id']
+		return None
+
+
 	def event_to_task(self, event, label_ids=None, project_id=None, section_id=None):
 		task = {
 			"content": event.name,
@@ -236,21 +244,14 @@ class ICS2Doist:
 		return l
 
 	def project_id(self, project_name):
-		projects = self.get_all_projects()
-		for project in projects:
-			name = project['name'].lower()
-			if self._strip_emoji(name) == project_name:
-				return project['id']
+		if project_name:
+			return self._find_needle_in_haystack(project_name.lower(), self.get_all_projects())
 		return None
 
 	def section_id(self, section_name):
-		sections = self.get_all_sections()
-		for section in sections:
-			name = section['name'].lower()
-			if self._strip_emoji(name) == section_name:
-				return section['id']
+		if section_name:
+			return self._find_needle_in_haystack(section_name.lower(), self.get_all_sections())
 		return None
-
 
 def parse_cmd_line():
 	parser = argparse.ArgumentParser(prog="ics2doist.py", usage='%(prog)s [options]', description='Import ICS entries as Todoist tasks')
