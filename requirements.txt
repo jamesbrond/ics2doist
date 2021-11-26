@@ -3,7 +3,7 @@ certifi==2021.10.8
 charset-normalizer==2.0.7
 ics==0.7
 idna==3.3
-importlib-metadata==4.8.1
+importlib-metadata==4.8.2
 keyring==23.2.1
 python-dateutil==2.8.2
 pywin32-ctypes==0.2.0
