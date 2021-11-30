@@ -1,15 +1,11 @@
 import re
 import sys
-import json
-import uuid
 import keyring
 import logging
 import argparse
-import requests
 from ics import Calendar
 from dateutil import parser
-
-TODOIST_API_URL="https://api.todoist.com/rest/v1"
+from todoist_api_python.api import TodoistAPI
 
 class RRule:
 	def __init__(self, start, rule_string):
@@ -121,25 +117,7 @@ class ICSCalendar:
 
 class ICS2Doist:
 	def __init__(self, **options):
-		self.todoist_api_url = options.pop('todoist_api_url', 'https://api.todoist.com/rest/v1')
-		self.api_token = options['api_token']
-
-	def _doist_api_get(self, action):
-		return requests.get(
-			f"{self.todoist_api_url}/{action}",
-			headers={
-				"Authorization": f"Bearer {self.api_token}"
-			}).json()
-
-	def _doist_api_post(self, action, data):
-		return requests.post(
-			f"{self.todoist_api_url}/{action}",
-			data=json.dumps(data),
-			headers={
-				"Content-Type": "application/json",
-				"X-Request-Id": str(uuid.uuid4()),
-				"Authorization": f"Bearer {self.api_token}"
-			}).json()
+		self.api = TodoistAPI(options['api_token'])
 
 	def _strip_emoji(self, str):
 		if str:
@@ -154,15 +132,13 @@ class ICS2Doist:
 
 	def _find_needle_in_haystack(self, needle, haystack):
 		for straw in haystack:
-			name = straw['name'].lower()
+			name = straw.name.lower()
 			if self._strip_emoji(name) == needle:
-				return straw['id']
+				return straw.id
 		return None
-
 
 	def event_to_task(self, event, label_ids=None, project_id=None, section_id=None):
 		task = {
-			"content": event.name,
 			"description": event.description,
 			"completed": False
 			# TODO priority
@@ -188,45 +164,15 @@ class ICS2Doist:
 			# TODO check timezone
 			task['due_datetime'] = event.end.isoformat()
 
-		return task
-
-	def add_task(self, task):
-		"""
-		Creates a new task  and returns it as a JSON object
-		"""
-		return self._doist_api_post('tasks', task)
-
-	def add_label(self, name):
-		"""
-		Creates a new label and returns its object as JSON
-		"""
-		return self._doist_api_post('labels', {"name": name})
-
-	def get_all_projects(self):
-		"""
-		Returns JSON-encoded array containing all user projects
-		"""
-		return self._doist_api_get('projects')
-
-	def get_all_sections(self):
-		"""
-		Returns a JSON array of all sections
-		"""
-		return self._doist_api_get('sections')
-
-	def get_all_labels(self):
-		"""
-		Returns a JSON-encoded array containing all user labels
-		"""
-		return self._doist_api_get('labels')
+		return event.name, task
 
 	def get_label(self, name):
 		"""
 		Returns a label JSON-encoded object
 		"""
-		labels = self.get_all_labels()
+		labels = self.api.get_labels()
 		for label in labels:
-			if label['name'] == name:
+			if label.name == name:
 				return label
 		return None
 
@@ -238,19 +184,19 @@ class ICS2Doist:
 		if label_name:
 			l = self.get_label(label_name)
 			if l is None:
-				l = self.add_label(label_name)
+				l = self.api.add_label( {"name": label_name})
 		if l != None:
-			l = [l['id']]
+			l = [l.id]
 		return l
 
 	def project_id(self, project_name):
 		if project_name:
-			return self._find_needle_in_haystack(project_name.lower(), self.get_all_projects())
+			return self._find_needle_in_haystack(project_name.lower(), self.api.get_projects())
 		return None
 
 	def section_id(self, section_name):
 		if section_name:
-			return self._find_needle_in_haystack(section_name.lower(), self.get_all_sections())
+			return self._find_needle_in_haystack(section_name.lower(), self.api.get_sections())
 		return None
 
 def parse_cmd_line():
@@ -293,8 +239,9 @@ def parse_cmd_line():
 
 	return parser.parse_args()
 
-def _dump_json(obj):
-	print(json.dumps(obj, indent=3))
+def _dump_json(obj_list):
+	for obj in  obj_list:
+		print(obj)
 
 def set_api_token(service_id, token):
 	keyring.set_password(service_id, 'API_TOKEN', token)
@@ -317,25 +264,25 @@ def main():
 			setup(service_id)
 			api_token = get_api_token(service_id)
 
-		ics2doist = ICS2Doist(api_token=api_token, todoist_api_url=TODOIST_API_URL)
+		ics2doist = ICS2Doist(api_token=api_token)
 		if args.ics_file:
 			cal = ICSCalendar()
 			for event in cal.read(args.ics_file):
-				task = ics2doist.event_to_task(
+				(task_content, task) = ics2doist.event_to_task(
 					event = event,
 					label_ids = ics2doist.label_ids(args.label),
 					project_id = ics2doist.project_id(args.project),
 					section_id = ics2doist.section_id(args.section))
-				print(f"Add task {task['content']} ... ", end="")
-				ics2doist.add_task(task)
+				print(f"Add task {task_content} ... ", end="")
+				ics2doist.api.add_task(content=task_content, **task)
 				print("\tdone")
 
 		elif args.projects:
-			_dump_json(ics2doist.get_all_projects())
+			_dump_json(ics2doist.api.get_projects())
 		elif args.sections:
-			_dump_json(ics2doist.get_all_sections())
+			_dump_json(ics2doist.api.get_sections())
 		elif args.labels:
-			_dump_json(ics2doist.get_all_labels())
+			_dump_json(ics2doist.api.get_labels())
 
 		return 0
 	except Exception as e:
