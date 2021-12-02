@@ -1,0 +1,9 @@
+Home:
+  sections:
+    -
+      name: "To Watch"
+      tasks:
+        -
+          content: "{title}"
+          description: "{on} {type}"
+          due_string: "{start}"

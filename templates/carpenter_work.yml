@@ -1,0 +1,31 @@
+
+Diy:
+  sections:
+    -
+      name: "Carpenter"
+      tasks:
+        -
+          content: "{project}"
+          labels: [ "next" ]
+          tasks:
+            -
+              content: "prendere misure"
+              description: "progetto: {project}"
+              labels: [ "15min" ]
+            -
+              content: "progettazione"
+              description: "progetto: {project}"
+              labels: [ "design", "1h" ]
+            -
+              content: "trovare materiali"
+              description: "progetto: {project}"
+              labels: [ "purchase" ]
+            -
+              content: "costruzione"
+              description: "progetto: {project}"
+            -
+              content: "rifinitura"
+              description: "progetto: {project}"
+            -
+              content: "installazione"
+              description: "progetto: {project}"

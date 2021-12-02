@@ -16,6 +16,8 @@
 #               - labale name
 #             tasks: sub task
 #   tasks: project level tasks
+#
+# PLACEHOLDERS can be used both in name and description -D placeholder0=value0,placeholder1=value1
 #######################################################################
 
 Delete Me Project:
