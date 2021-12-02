@@ -1,0 +1,12 @@
+Diy:
+  sections:
+    -
+      name: "Cook"
+      tasks:
+        -
+          content: "{title}"
+          due_string: "{date}"
+          tasks:
+            -
+              content: "spesa"
+              description: "spesa per {title}"
