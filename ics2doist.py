@@ -1,7 +1,8 @@
 import sys
-import keyring
 import logging
 import argparse
+import lib.utils as utils
+import lib.key_ring as keyring
 from lib.ics2doist import ICS2Doist
 from lib.icscalendar import ICSCalendar
 
@@ -22,7 +23,7 @@ def parse_cmd_line():
 
 	parser.add_argument('-s', '--section',
 		dest='section',
-		help='name of section to put all events into.')
+		help='name of section to put all events into')
 
 	parser.add_argument('--projects',
     dest='projects',
@@ -45,30 +46,16 @@ def parse_cmd_line():
 
 	return parser.parse_args()
 
-def _dump_json(obj_list):
-	for obj in  obj_list:
-		print(obj)
-
-def set_api_token(service_id, token):
-	keyring.set_password(service_id, 'API_TOKEN', token)
-
-def get_api_token(service_id):
-	return keyring.get_password(service_id, 'API_TOKEN')
-
-def setup(service_id):
-	token = input("Please enter your API token: ")
-	set_api_token(service_id, token)
-
 def main():
 	service_id = "JBROND_ICS2DOIST"
 	args = parse_cmd_line()
 
 	try:
-		api_token = get_api_token(service_id)
+		api_token = keyring.get_api_token(service_id)
 		while not api_token:
 			logging.warning(f"Todoist API token not found for {service_id} application.")
-			setup(service_id)
-			api_token = get_api_token(service_id)
+			keyring.setup(service_id)
+			api_token = keyring.get_api_token(service_id)
 
 		ics2doist = ICS2Doist(api_token=api_token)
 		if args.ics_file:
@@ -84,11 +71,11 @@ def main():
 				print("\tdone")
 
 		elif args.projects:
-			_dump_json(ics2doist.api.get_projects())
+			utils.dump_json(ics2doist.api.get_projects())
 		elif args.sections:
-			_dump_json(ics2doist.api.get_sections())
+			utils.dump_json(ics2doist.api.get_sections())
 		elif args.labels:
-			_dump_json(ics2doist.api.get_labels())
+			utils.dump_json(ics2doist.api.get_labels())
 
 		return 0
 	except Exception as e:

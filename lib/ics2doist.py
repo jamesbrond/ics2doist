@@ -1,28 +1,10 @@
-import re
+import utils
 from lib.rrule import RRule
 from todoist_api_python.api import TodoistAPI
 
 class ICS2Doist:
 	def __init__(self, **options):
 		self.api = TodoistAPI(options['api_token'])
-
-	def _strip_emoji(self, str):
-		if str:
-			emoji_pattern = re.compile("["
-			u"\U0001F600-\U0001F64F"  # emoticons
-			u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-			u"\U0001F680-\U0001F6FF"  # transport & map symbols
-			u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-			"]+", flags=re.UNICODE)
-			return emoji_pattern.sub(r'', str).strip()
-		return None
-
-	def _find_needle_in_haystack(self, needle, haystack):
-		for straw in haystack:
-			name = straw.name.lower()
-			if self._strip_emoji(name) == needle:
-				return straw.id
-		return None
 
 	def event_to_task(self, event, label_ids=None, project_id=None, section_id=None):
 		task = {
@@ -78,10 +60,10 @@ class ICS2Doist:
 
 	def project_id(self, project_name):
 		if project_name:
-			return self._find_needle_in_haystack(project_name.lower(), self.api.get_projects())
+			return utils.find_needle_in_haystack([project_name], self.api.get_projects())
 		return None
 
 	def section_id(self, section_name):
 		if section_name:
-			return self._find_needle_in_haystack(section_name.lower(), self.api.get_sections())
+			return utils.find_needle_in_haystack([section_name], self.api.get_sections())
 		return None
