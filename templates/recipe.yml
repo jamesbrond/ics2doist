@@ -1,3 +1,6 @@
+# Usage:
+# python doistemplate.py templates/recipe.yml -D title="crepe alla nutella",date="saturday"
+
 Diy:
   sections:
     -

@@ -1,3 +1,6 @@
+# Usage:
+# python doistemplate.py templates/towatch.yml -D title="Wheel of Time",on="Amazon Prime",type="serie",start="27 nov"
+
 Home:
   sections:
     -
