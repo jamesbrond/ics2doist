@@ -44,11 +44,17 @@ def parse_cmd_line():
 		action='version',
 		version='%(prog)s 1.4.0')
 
+	parser.add_argument('-d', '--debug',
+    dest='loglevel',
+    default=logging.INFO, action='store_const', const=logging.DEBUG,
+    help='More verbose output')
+
 	return parser.parse_args()
 
 def main():
 	service_id = "JBROND_ICS2DOIST"
 	args = parse_cmd_line()
+	logging.basicConfig(level=args.loglevel, format="[%(levelname)s] %(message)s")
 
 	try:
 		api_token = keyring.get_api_token(service_id)
@@ -66,9 +72,9 @@ def main():
 					label_ids = ics2doist.label_ids(args.label),
 					project_id = ics2doist.project_id(args.project),
 					section_id = ics2doist.section_id(args.section))
-				print(f"Add task {task_content} ... ", end="")
+				logging.info(f"Adding task {task_content} ... ", end="")
+				logging.debug(task)
 				ics2doist.api.add_task(content=task_content, **task)
-				print("\tdone")
 
 		elif args.projects:
 			utils.dump_json(ics2doist.api.get_projects())

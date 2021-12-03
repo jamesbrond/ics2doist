@@ -4,8 +4,6 @@ import argparse
 import lib.key_ring as keyring
 from lib.doistemplate import DoistTemplate
 
-#######################################################################
-
 class StoreDictKeyPair(argparse.Action):
 	def __call__(self, parser, namespace, values, option_string=None):
 		my_dict = {}
@@ -30,11 +28,17 @@ def parse_cmd_line():
 		action='version',
 		version='%(prog)s 1.0.0')
 
+	parser.add_argument('-d', '--debug',
+    dest='loglevel',
+    default=logging.INFO, action='store_const', const=logging.DEBUG,
+    help='More verbose output')
+
 	return parser.parse_args()
 
 def main():
 	service_id = "JBROND_ICS2DOIST"
 	args = parse_cmd_line()
+	logging.basicConfig(level=args.loglevel, format="[%(levelname)s] %(message)s")
 
 	try:
 		api_token = keyring.get_api_token(service_id)
@@ -45,6 +49,7 @@ def main():
 
 		tmpl = DoistTemplate(api_token)
 		with args.template as file:
+			logging.debug(f"open file {file}")
 			tmpl.parse(file, args.placeholders)
 
 		return 0

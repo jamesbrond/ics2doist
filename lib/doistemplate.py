@@ -1,3 +1,4 @@
+import logging
 import lib.utils as utils
 from yaml import load
 try:
@@ -44,11 +45,12 @@ class DoistTemplate:
 		if project_id is None:
 			prj = self._parse_items(inner, ["color", "favorite"])
 			prj["name"] = self._replace(name, placeholders)
+			logging.debug(f"create project {prj}")
 			project = self.api.add_project(**prj)
 			self.projects.append(project)
 			project_id = project.id
 
-		print(f"Project: {name} ({project_id})")
+		logging.info(f"Project: {name} ({project_id})")
 
 		if "sections" in inner:
 			for section in inner["sections"]:
@@ -64,11 +66,12 @@ class DoistTemplate:
 				"name": self._replace(section["name"], placeholders),
 				"project_id": project_id
 			}
+			logging.debug(f"create section {sec}")
 			section_object = self.api.add_section(**sec)
 			self.sections.append(section_object)
 			section_id = section_object.id
 
-		print(f"Section: {section['name']} ({section_id})")
+		logging.info(f"Section: {section['name']} ({section_id})")
 
 		if "tasks" in section:
 			for task in section["tasks"]:
@@ -89,8 +92,9 @@ class DoistTemplate:
 			for label in task["labels"]:
 				label_ids.append(self._label(label, placeholders))
 			tsk["label_ids"] = label_ids
+		logging.debug(f"create task {tsk}")
 		t = self.api.add_task(**tsk)
-		print(f"Task: {t.content} ({t.id})")
+		logging.info(f"Task: {t.content} ({t.id})")
 
 		if "tasks" in task:
 			for subtask in task["tasks"]:
@@ -101,6 +105,7 @@ class DoistTemplate:
 		n = self._replace(name, placeholders)
 		label_id = utils.find_needle_in_haystack([n], self.labels)
 		if label_id is None:
+			logging.debug(f"create label {n}")
 			label = self.api.add_label(name=n)
 			label_id = label.id
 			self.labels.append(label)

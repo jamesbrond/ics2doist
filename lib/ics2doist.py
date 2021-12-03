@@ -1,4 +1,5 @@
-import utils
+import logging
+import lib.utils as utils
 from lib.rrule import RRule
 from todoist_api_python.api import TodoistAPI
 
@@ -53,6 +54,7 @@ class ICS2Doist:
 		if label_name:
 			l = self.get_label(label_name)
 			if l is None:
+				logging.debug(f"create new label {label_name}")
 				l = self.api.add_label( {"name": label_name})
 		if l != None:
 			l = [l.id]
