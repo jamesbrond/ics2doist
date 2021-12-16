@@ -11,23 +11,23 @@ Diy:
           labels: [ "next" ]
           tasks:
             -
-              content: "prendere misure"
-              description: "progetto: {project}"
+              content: "misure ({project})"
+              description: "prendere le misure"
               labels: [ "15min" ]
             -
-              content: "progettazione"
-              description: "progetto: {project}"
-              labels: [ "design", "1h" ]
+              content: "design ({project})"
+              description: "progettare {project}"
+              labels: [ "design", "60min" ]
             -
-              content: "trovare materiali"
-              description: "progetto: {project}"
+              content: "materiali ({project})"
+              description: "lista dei materiali"
               labels: [ "purchase" ]
             -
-              content: "costruzione"
-              description: "progetto: {project}"
+              content: "costruzione ({project})"
+              description: "realizzazione di {project}"
             -
-              content: "rifinitura"
-              description: "progetto: {project}"
+              content: "rifinitura ({project})"
+              description: "ultimi ritocchi"
             -
-              content: "installazione"
-              description: "progetto: {project}"
+              content: "installazione ({project})"
+              description: "{project} pronto: messa in opera"
