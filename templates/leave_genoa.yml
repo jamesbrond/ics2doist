@@ -4,7 +4,7 @@
 Inbox:
   tasks:
     -
-      content: "lasciare casa Genova"
+      content: "* lasciare casa Genova"
       due_string: "{date}"
       labels: [genova]
       tasks:

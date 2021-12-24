@@ -1,0 +1,32 @@
+# Usage:
+# python doistemplate.py templates/elia_dai_nonni.yml -D date="thu",days=2
+
+Inbox:
+  tasks:
+    -
+      content: "*  Elia dai nonni: cibo"
+      due_string: "{date}"
+      labels: [elia]
+      tasks:
+        -
+          content: latte [4x{days}, 8x({days}+1)] e **biberon**
+        -
+          content: mais e tapioca
+        -
+          content: bicchiere
+    -
+      content: "*  Elia dai nonni: vestiti"
+      due_string: "{date}"
+      labels: [elia]
+      tasks:
+        -
+          content: pantaloni, maglia, maglietta, canottiera, calzini
+        -
+          content: pigiama, sacco nanna
+        -
+          content: asciugamano
+        -
+          content: ciabattine
+        -
+          content: pannolini [notte 1x({days}+1); giorno 5x{days}]
+
