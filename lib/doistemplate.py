@@ -25,7 +25,8 @@ class DoistTemplate:
 			return
 		template = load(file, Loader=Loader)
 		tpl = list(template)
-		self._project(tpl[0], template, placelholders)
+		for t in tpl:
+			self._project(t, template, placelholders)
 
 	def _parse_items(self, obj, list_keys, placeholders=None):
 		item = {}
