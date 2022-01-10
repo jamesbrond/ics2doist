@@ -10,4 +10,4 @@ requests==2.27.1
 six==1.16.0
 TatSu==5.7.3
 urllib3==1.26.8
-zipp==3.6.0
+zipp==3.7.0
