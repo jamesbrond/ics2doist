@@ -36,7 +36,7 @@ class DoistTemplate:
 		return item
 
 	def _replace(self, value, placeholders):
-		if value is not None and placeholders is not None:
+		if value is not None and isinstance(value, str) and placeholders is not None:
 			return value.format(**placeholders)
 		return value
 
