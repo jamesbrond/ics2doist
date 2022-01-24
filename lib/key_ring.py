@@ -9,3 +9,5 @@ def get_api_token(service_id):
 def setup(service_id):
 	token = input("Please enter your API token: ")
 	set_api_token(service_id, token)
+
+# ~@:-]

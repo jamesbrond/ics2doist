@@ -29,3 +29,5 @@ def find_needle_in_haystack(needles, haystack, params= [ "name" ]):
 def dump_json(obj_list):
 	for obj in  obj_list:
 		print(obj)
+
+# ~@:-]

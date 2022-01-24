@@ -10,7 +10,8 @@ class ICS2Doist:
 	def event_to_task(self, event, label_ids=None, project_id=None, section_id=None):
 		task = {
 			"description": event.description,
-			"completed": False
+			"completed": False,
+			"priority": 4
 			# TODO priority
 		}
 		if project_id:
@@ -69,3 +70,5 @@ class ICS2Doist:
 		if section_name:
 			return utils.find_needle_in_haystack([section_name], self.api.get_sections())
 		return None
+
+# ~@:-]

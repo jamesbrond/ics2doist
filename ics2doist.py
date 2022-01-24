@@ -72,7 +72,7 @@ def main():
 					label_ids = ics2doist.label_ids(args.label),
 					project_id = ics2doist.project_id(args.project),
 					section_id = ics2doist.section_id(args.section))
-				logging.info(f"Adding task {task_content} ... ", end="")
+				logging.info(f"Adding task {task_content}:")
 				logging.debug(task)
 				ics2doist.api.add_task(content=task_content, **task)
 

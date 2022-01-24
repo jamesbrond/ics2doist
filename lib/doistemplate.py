@@ -111,3 +111,5 @@ class DoistTemplate:
 			label_id = label.id
 			self.labels.append(label)
 		return label_id
+
+# ~@:-]

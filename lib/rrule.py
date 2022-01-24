@@ -83,3 +83,5 @@ class RRule:
 				raise ValueError("unknown parameter '%s'" % name)
 			except (KeyError, ValueError):
 				raise ValueError("invalid '%s': %s" % (name, value))
+
+# ~@:-]
