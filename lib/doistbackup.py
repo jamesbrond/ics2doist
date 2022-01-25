@@ -35,15 +35,16 @@ class DoistBackup:
 		logging.debug(f"wrote {len(content)} bytes")
 
 	def sync(self, content=None):
+		self.api.reset_state()
 		if content is None:
-			return bytes(json.dumps(self.api.state, default=state_default), 'utf8')
+			resp = self.api.sync()
+			return bytes(json.dumps(resp), 'utf8')
 		else:
-			self.api.reset_state()
 			self.api._update_state(json.loads(content.decode('utf8')))
 			self.api._write_cache()
+			resp = self.api.sync()
+			print(bytes(json.dumps(resp), 'utf8'))
+			logging.debug(resp)
 			raise NotImplementedError("Not implemented yet because sync doesn't update server")
-			# resp = self.api.sync()
-			# print(bytes(json.dumps(resp), 'utf8'))
-			# logging.debug(resp)
 
 # ~@:-]
