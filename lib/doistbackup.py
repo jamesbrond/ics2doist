@@ -12,8 +12,9 @@ class DoistBackup:
 		self.bkgfile = f"{filename}-{datetime.now().strftime('%Y%m%d%H%M%S')}.bak.gz"
 
 	def backup(self):
-		content = self.sync()
+		self.write_file(self.sync())
 
+	def write_file(self, content):
 		logging.info(f"write to {self.bkgfile}")
 		with gzip.open(self.bkgfile, 'wb') as f:
 			f.write(content)

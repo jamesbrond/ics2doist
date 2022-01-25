@@ -47,7 +47,10 @@ def main():
 			keyring.setup(service_id)
 			api_token = keyring.get_api_token(service_id)
 
-		if args.is_backup:
+		if args.is_restore:
+			rest = DoistRestore(args.filename, api_token)
+			rest.restore()
+		elif args.is_backup:
 			bkg = DoistBackup(args.filename, api_token)
 			bkg.backup()
 
