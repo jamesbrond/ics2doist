@@ -1,5 +1,6 @@
 import gzip
 import json
+import uuid
 import logging
 import todoist
 from datetime import datetime
@@ -43,8 +44,57 @@ class DoistBackup:
 			self.api._update_state(json.loads(content.decode('utf8')))
 			self.api._write_cache()
 			resp = self.api.sync()
-			print(bytes(json.dumps(resp), 'utf8'))
+			# print(bytes(json.dumps(resp), 'utf8'))
 			logging.debug(resp)
-			raise NotImplementedError("Not implemented yet because sync doesn't update server")
+			commands = []
+			for i in resp.labels:
+				commands.append(self.command("label_add", i.id, self.command_args_label(i)))
+			for i in resp.projects:
+				commands.append(self.command("project_add", i.id, self.command_args_project(i)))
+			for i in resp.sections:
+				commands.append(self.command("section_add", i.id, self.command_args_section(i)))
+			for i in resp.items:
+				if i.is_deleted:
+					commands.append(self.command("item_add", i.id, self.command_args_item(i)))
 
+			raise NotImplementedError("Not implemented yet because sync doesn't update server")
+			# https://todoist.com/help/articles/how-to-format-your-csv-file-so-you-can-import-it-into-todoist
+
+	def command(self, type, id, args):
+		return {
+			"type": type,
+			"uuid":  self.generate_uuid(),
+			"temp_id": id,
+			"args": args
+		}
+
+	def command_args_label(self, item):
+		return {
+
+		}
+
+	def command_args_project(self, item):
+		return {
+
+		}
+
+	def command_args_section(self, item):
+		return {
+
+		}
+
+	def command_args_item(self, item):
+		return {
+			"content": item.content,
+			"description": item.description,
+			"due": item.due,
+			"labels": item.labels,
+			"parent_id": item.parent_id,
+			"priority": item.priority,
+			"project_id": item.project_id,
+			"section_id": item.section_id,
+		}
+
+	def generate_uuid(self):
+		return str(uuid.uuid4())
 # ~@:-]
