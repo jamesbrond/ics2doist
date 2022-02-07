@@ -26,28 +26,28 @@ def parse_cmd_line():
 		help='name of section to put all events into')
 
 	parser.add_argument('--projects',
-    dest='projects',
-    default=False, action='store_true',
-    help='prints a JSON-encoded array containing all user projects and exit')
+		dest='projects',
+		default=False, action='store_true',
+		help='prints a JSON-encoded array containing all user projects and exit')
 
 	parser.add_argument('--sections',
-    dest='sections',
-    default=False, action='store_true',
-    help='prints a JSON array of all sections and exit')
+		dest='sections',
+		default=False, action='store_true',
+		help='prints a JSON array of all sections and exit')
 
 	parser.add_argument('--labels',
-    dest='labels',
-    default=False, action='store_true',
-    help='prints a JSON-encoded array containing all user labels and exit')
+		dest='labels',
+		default=False, action='store_true',
+		help='prints a JSON-encoded array containing all user labels and exit')
 
 	parser.add_argument('--version',
 		action='version',
 		version='%(prog)s 1.4.0')
 
 	parser.add_argument('-d', '--debug',
-    dest='loglevel',
-    default=logging.INFO, action='store_const', const=logging.DEBUG,
-    help='More verbose output')
+		dest='loglevel',
+		default=logging.INFO, action='store_const', const=logging.DEBUG,
+		help='More verbose output')
 
 	return parser.parse_args()
 

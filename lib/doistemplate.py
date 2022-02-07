@@ -2,9 +2,9 @@ import logging
 import lib.utils as utils
 from yaml import load
 try:
-  from yaml import CLoader as Loader
+	from yaml import CLoader as Loader
 except ImportError:
-  from yaml import Loader
+	from yaml import Loader
 from todoist_api_python.api import TodoistAPI
 
 class DoistTemplate:

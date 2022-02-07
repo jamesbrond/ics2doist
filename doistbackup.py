@@ -28,12 +28,11 @@ def parse_cmd_line():
 		version='%(prog)s 1.0.0')
 
 	parser.add_argument('-d', '--debug',
-    dest='loglevel',
-    default=logging.INFO, action='store_const', const=logging.DEBUG,
-    help='More verbose output')
+		dest='loglevel',
+		default=logging.INFO, action='store_const', const=logging.DEBUG,
+		help='More verbose output')
 
 	return parser.parse_args()
-
 
 def main():
 	service_id = "JBROND_ICS2DOIST"
