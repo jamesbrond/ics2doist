@@ -53,18 +53,20 @@ class DoistTemplate:
 
 		logging.info(f"Project: {name} ({project_id})")
 
-		if "sections" in inner:
-			for section in inner["sections"]:
-				self._section(project_id, section, placeholders)
-		if "tasks" in inner:
-			for task in inner["tasks"]:
-				self._task(project_id=project_id, section_id=None, parent_id=None, task=task, placeholders=placeholders)
+		sections = list(inner)
+		for section in sections:
+			if section == "tasks":
+				for task in inner[section]:
+					self._task(project_id=project_id, section_id=None, parent_id=None, task=task, placeholders=placeholders)
+			else:
+				logging.debug(f"{section}: {inner[section]}")
+				self._section(project_id, name, inner[section], placeholders)
 
-	def _section(self, project_id, section, placeholders):
-		section_id = utils.find_needle_in_haystack([section["name"], project_id], self.sections, ["name", "project_id"])
+	def _section(self, project_id, name, content, placeholders):
+		section_id = utils.find_needle_in_haystack([name, project_id], self.sections, ["name", "project_id"])
 		if section_id is None:
 			sec = {
-				"name": self._replace(section["name"], placeholders),
+				"name": self._replace(name, placeholders),
 				"project_id": project_id
 			}
 			logging.debug(f"create section {sec}")
@@ -72,10 +74,10 @@ class DoistTemplate:
 			self.sections.append(section_object)
 			section_id = section_object.id
 
-		logging.info(f"Section: {section['name']} ({section_id})")
+		logging.info(f"Section: {name} ({section_id})")
 
-		if "tasks" in section:
-			for task in section["tasks"]:
+		if "tasks" in content:
+			for task in content["tasks"]:
 				self._task(project_id=None, section_id=section_id, parent_id=None, task=task, placeholders=placeholders)
 
 	def _task(self, project_id, section_id, parent_id, task, placeholders):
