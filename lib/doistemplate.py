@@ -1,11 +1,38 @@
+import os
+import json
+import yaml
 import logging
 import lib.utils as utils
-from yaml import load
-try:
-	from yaml import CLoader as Loader
-except ImportError:
-	from yaml import Loader
+from typing import Any, IO
 from todoist_api_python.api import TodoistAPI
+
+class Loader(yaml.SafeLoader):
+	"""YAML Loader with `!include` constructor."""
+
+	def __init__(self, stream: IO) -> None:
+		"""Initialise Loader."""
+
+		try:
+			self._root = os.path.split(stream.name)[0]
+		except AttributeError:
+			self._root = os.path.curdir
+		super().__init__(stream)
+
+def construct_include(loader: Loader, node: yaml.Node) -> Any:
+	"""Include file referenced at node."""
+
+	filename = os.path.abspath(os.path.join(loader._root, loader.construct_scalar(node)))
+	extension = os.path.splitext(filename)[1].lstrip('.')
+	logging.debug(f"include {filename}")
+	with open(filename, 'r', encoding="utf8") as f:
+		if extension in ('yaml', 'yml'):
+			return yaml.load(f, Loader)
+		elif extension in ('json', ):
+			return json.load(f)
+		else:
+			return ''.join(f.readlines())
+
+yaml.add_constructor('!include', construct_include, Loader)
 
 class DoistTemplate:
 	"""
@@ -23,10 +50,15 @@ class DoistTemplate:
 		"""
 		if file is None:
 			return
-		template = load(file, Loader=Loader)
-		tpl = list(template)
-		for t in tpl:
-			self._project(t, template, placelholders)
+		template = yaml.load(file, Loader=Loader)
+		print(template)
+		print(f"### LEN {len(template)}")
+		for t in template:
+			if isinstance(t, str):
+				self._project(t, template[t], placelholders)
+			else:
+				p = list(t)[0]
+				self._project(p, t[p], placelholders)
 
 	def _parse_items(self, obj, list_keys, placeholders=None):
 		item = {}
@@ -40,8 +72,7 @@ class DoistTemplate:
 			return value.format(**placeholders)
 		return value
 
-	def _project(self, name, outer, placeholders):
-		inner = outer[name]
+	def _project(self, name, inner, placeholders):
 		project_id = utils.find_needle_in_haystack([name], self.projects)
 		if project_id is None:
 			prj = self._parse_items(inner, ["color", "favorite"])
