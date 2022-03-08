@@ -17,7 +17,7 @@ def parse_cmd_line():
 
 	parser.add_argument(
 		'template',
-		type=argparse.FileType('r'))
+		type=argparse.FileType('r', encoding="utf8"))
 
 	parser.add_argument("-D",
 		dest="placeholders",
