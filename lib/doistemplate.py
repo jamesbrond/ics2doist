@@ -60,7 +60,7 @@ class DoistTemplate:
 					self._task(project_id=project_id, section_id=None, parent_id=None, task=task, placeholders=placeholders)
 			else:
 				logging.debug(f"{section}: {inner[section]}")
-				self._section(project_id, name, inner[section], placeholders)
+				self._section(project_id, section, inner[section], placeholders)
 
 	def _section(self, project_id, name, content, placeholders):
 		section_id = utils.find_needle_in_haystack([name, project_id], self.sections, ["name", "project_id"])
