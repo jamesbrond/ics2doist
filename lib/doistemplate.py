@@ -51,8 +51,6 @@ class DoistTemplate:
 		if file is None:
 			return
 		template = yaml.load(file, Loader=Loader)
-		print(template)
-		print(f"### LEN {len(template)}")
 		for t in template:
 			if isinstance(t, str):
 				self._project(t, template[t], placelholders)
