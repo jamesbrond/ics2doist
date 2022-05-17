@@ -38,6 +38,7 @@ class DoistTemplate:
 	"""
 	Import YAML template file into Todoist application
 	"""
+
 	def __init__(self, api_token):
 		self.api = TodoistAPI(api_token)
 		self.projects = self.api.get_projects()
@@ -48,6 +49,7 @@ class DoistTemplate:
 		"""
 		Parse the template YAML file using placeholdes dictionary
 		"""
+
 		if file is None:
 			return
 		template = yaml.load(file, Loader=Loader)

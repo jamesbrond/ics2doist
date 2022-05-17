@@ -1,60 +1,46 @@
 ########################################################################
 # Project Name (could be Inbox)
-#   color: ID of the color [https://developer.todoist.com/guides/#colors]
-#   favorite: Whether the project is a favorite (a true or false value)
-#   sections: section
-#      -
-#         name: section name
-#         tasks:
-#           -
+#    color: ID of the color [https://developer.todoist.com/guides/#colors]
+#    Section Name:
+#       tasks:
+#          -
 #             content: This value may contain markdown-formatted text and hyperlinks [https://todoist.com/help/articles/text-formatting]
 #             description: A description for the task
 #             completed: Flag to mark completed tasks
 #             priority: Task priority from 1 (normal) to 4 (urgent)
 #             due_string: Human defined task due date (ex.: "next Monday", "Tomorrow"). Value is set using local (not UTC) time
 #             labels:
-#               - labale name
-#             tasks: sub task
-#   tasks: project level tasks
+#                - labale name
+#             tasks: # put sub task here
+#    tasks: project level tasks
 #
 # PLACEHOLDERS can be used both in name and description -D placeholder0=value0,placeholder1=value1
 #######################################################################
 
 Delete Me Project:
   color: 40
-  favorite: false
-  sections:
-    -
-      name: "delete me 0"
-      tasks:
-        -
-          content: "task 0"
-          description: "description task 0"
-          completed: false
-          priority: 1
-          due_string: "tomorrow"
-          labels:
-            - "delete me 0"
-            - "delete me 1"
-        -
-          content: "task 1"
-          description: "delete task 1"
-          due_string: "2021-12-31"
-          labels: [ "delete me 0" ]
-          tasks:
-            -
-              content: "subtask 0"
-            -
-              content: "subtask 1"
-    -
-      name: "delete me 1"
-      tasks:
-        -
-          content: "task 2"
-          description: "delete task 2"
-        -
-          content: "task 3"
+  delete me 0:
+    tasks:
+      - content: "task 0"
+        description: "description task 0"
+        completed: false
+        priority: 1
+        due_string: "tomorrow"
+        labels:
+          - "delete me 0"
+          - "delete me 1"
+      - content: "task 1"
+        description: "delete task 1"
+        due_string: "2021-12-31"
+        labels: [ "delete me 0" ]
+        tasks:
+          - content: "subtask 0"
+          - content: "subtask 1"
+  delete me 1:
+    tasks:
+      - content: "task 2"
+        description: "delete task 2"
+      - content: "task 3"
 
   tasks:
-    -
-      content: "task 4"
+    - content: "task 4"

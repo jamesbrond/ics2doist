@@ -1,0 +1,17 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "planon",
+			"type": "shell",
+			"command": "source venv/Scripts/activate && python ics2doist.py -c ../../../Downloads/planon.ics -d -p Work -s back2office",
+			"group": {
+				"kind": "none",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		}
+	]
+}
