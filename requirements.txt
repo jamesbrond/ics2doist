@@ -1,6 +1,6 @@
 arrow==0.14.7
 attrs==21.4.0
-certifi==2021.10.8
+certifi==2022.5.18.1
 charset-normalizer==2.0.12
 ics==0.7
 idna==3.3
