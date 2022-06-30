@@ -31,21 +31,25 @@ def parse_cmd_line():
 	parser.add_argument('-d', '--debug',
 		dest='loglevel',
 		default=logging.INFO, action='store_const', const=logging.DEBUG,
-		help='More verbose output')
+		help='more verbose output')
+
+	parser.add_argument('--id',
+		dest='service_id',
+		default="JBROND_ICS2DOIST",
+		help='keyring service name where store Todoist API Token')
 
 	return parser.parse_args()
 
 def main():
-	service_id = "JBROND_ICS2DOIST"
 	args = parse_cmd_line()
 	logging.basicConfig(level=args.loglevel, format="[%(levelname)s] %(message)s")
 
 	try:
-		api_token = keyring.get_api_token(service_id)
+		api_token = keyring.get_api_token(args.service_id)
 		while not api_token:
-			logging.warning(f"Todoist API token not found for {service_id} application.")
-			keyring.setup(service_id)
-			api_token = keyring.get_api_token(service_id)
+			logging.warning(f"Todoist API token not found for {args.service_id} application.")
+			keyring.setup(args.service_id)
+			api_token = keyring.get_api_token(args.service_id)
 
 		tmpl = DoistTemplate(api_token)
 		with args.template as file:
