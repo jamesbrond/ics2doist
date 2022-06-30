@@ -26,8 +26,10 @@ class DoistTemplate:
 		template = yaml.load(file, Loader=CustomYamlLoader)
 		for t in template:
 			if isinstance(t, str):
+				# template with a single project root
 				self._project(t, template[t], placelholders)
 			else:
+				# template with multiple projects
 				p = list(t)[0]
 				self._project(p, t[p], placelholders)
 
@@ -44,6 +46,10 @@ class DoistTemplate:
 		return value
 
 	def _project(self, name, inner, placeholders):
+		if name == "tasks":
+			for task in inner:
+				self._task(project_id=None, section_id=None, parent_id=None, task=task, placeholders=placeholders)
+			return
 		project_id = utils.find_needle_in_haystack([name], self.projects)
 		if project_id is None:
 			prj = self._parse_items(inner, ["color", "favorite"])
