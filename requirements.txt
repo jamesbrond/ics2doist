@@ -3,9 +3,9 @@ attrs==21.4.0
 autopep8==1.6.0
 certifi==2022.6.15
 charset-normalizer==2.0.0
-ics==0.7
+ics==0.7.2
 idna==3.3
-importlib-metadata==4.11.4
+importlib-metadata==4.12.0
 keyring==23.6.0
 packaging==21.3
 pip-system-certs==2.1
