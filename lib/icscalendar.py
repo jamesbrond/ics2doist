@@ -14,7 +14,7 @@ class ICSCalendar:
 		"""
 		self.events = []
 		try:
-			with open(in_file, 'r') as file:
+			with open(in_file, 'r', encoding='utf8') as file:
 				ics_text = file.read()
 			c = Calendar(ics_text)
 			self.events = c.events
