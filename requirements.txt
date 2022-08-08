@@ -4,7 +4,7 @@ certifi==2022.6.15
 charset-normalizer==2.1.0
 ics==0.7.2
 idna==3.3
-keyring==23.7.0
+keyring==23.8.1
 packaging==21.3
 pip-system-certs==3.0
 pyparsing==3.0.9
