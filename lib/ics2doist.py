@@ -30,11 +30,9 @@ class ICS2Doist:
         if rrules is not None:
             task['due_string'] = str(RRule(event.begin, rrules))
         elif event.all_day:
-            task['due'] = {'date': event.begin.format('YYYY-MM-DD')}
+            task['due_date'] = event.begin.format('YYYY-MM-DD')
         else:
-            # TODO check timezone
-            task['due'] = {'datetime': event.begin.isoformat()}
-
+            task['due_datetime'] = event.begin.isoformat()
         return event.name, task
 
     def get_label(self, name):
