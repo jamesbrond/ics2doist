@@ -6,7 +6,7 @@ ics==0.7.2
 idna==3.3
 keyring==23.9.1
 packaging==21.3
-pip-system-certs==3.0
+pip-system-certs==3.1
 pyparsing==3.0.9
 python-dateutil==2.8.2
 pywin32-ctypes==0.2.0
